@@ -5,7 +5,7 @@
   "scripts": {
     "build": "prisma generate && nest build",
 
-    "start": "prisma generate && prisma db push && (node dist/main.js || node dist/src/main.js)",
+    "start": "prisma generate && prisma migrate deploy && prisma db seed && node dist/main.js",
     "start:prod": "node dist/main.js",
 
     "start:dev": "nest start --watch",
@@ -22,6 +22,11 @@
 
     "postinstall": "prisma generate"
   },
+
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+
   "dependencies": {
     "@nestjs/common": "^10.4.8",
     "@nestjs/config": "^3.2.3",
@@ -42,6 +47,7 @@
     "rxjs": "^7.8.1",
     "winston": "^3.15.0"
   },
+
   "devDependencies": {
     "@nestjs/cli": "^10.4.5",
     "@nestjs/schematics": "^10.1.4",
@@ -64,6 +70,7 @@
     "tsx": "^4.19.1",
     "typescript": "^5.6.3"
   },
+
   "jest": {
     "moduleFileExtensions": ["js", "json", "ts"],
     "rootDir": ".",
