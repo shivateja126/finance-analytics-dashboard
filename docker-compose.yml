@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: finance-platform-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: finance_platform
+      POSTGRES_USER: finance_user
+      POSTGRES_PASSWORD: finance_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+    container_name: finance-platform-backend
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql://finance_user:finance_password@postgres:5432/finance_platform?schema=public
+      JWT_SECRET: super-secret-jwt-key
+      PORT: 4000
+      FRONTEND_URL: http://localhost:3000
+    ports:
+      - "4000:4000"
+    command: sh -c "npx prisma migrate deploy && npm run start:prod"
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: finance-platform-frontend
+    depends_on:
+      - backend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:4000/api
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:
